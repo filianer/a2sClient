@@ -3,7 +3,8 @@ import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-rout
 
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
 	model() {
-		return this.get('store').findAll('todo');
+		var userId = this.get('session.data.authenticated.userId');
+		return this.store.query('todo',{'userId':userId}, { reload: true });
 	},
   	actions:{
 		update:function(model){
@@ -11,13 +12,23 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 			this.transitionTo('todo');
 		},
 		delete:function(model){
+			var that = this;
 			model.deleteRecord();
-			model.save();
+			model.save().then(function(value){
+				that.refresh();
+			});
 			this.transitionTo('todo');
 		},
 		new:function(newObject){
+			var that = this;
+			var userId = this.get('session.data.authenticated.userId');
+			newObject['userId'] = userId;
 			var todo = this.store.createRecord('todo',newObject);
-			todo.save();
+			todo.save().then(function(value) {
+	          that.refresh();
+	        }, function(reason) {
+	            // on rejection
+	        });
 		},
 		transition:function(){
 			this.transitionTo('todo');
