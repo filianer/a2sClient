@@ -1,0 +1,47 @@
+<div class="panel-footer clearfix">
+  {{! resumen}}
+  <div class="col-xs-8 col-sm-4 table-summary">
+    {{summary}}
+  </div>
+
+  {{! paginación }}
+  <div class="table-nav col-xs-4 col-sm-6 col-sm-push-2">
+    <div class="btn-toolbar pull-right" role="toolbar">
+      <a href="#" {{action "gotoFirst"}} class={{if gotoBackEnabled 'enabled' 'disabled'}}><span
+      class="glyphicon glyphicon-chevron-left"></span></a>
+      <a href="#" {{action "gotoPrev"}} class={{if gotoBackEnabled 'enabled' 'disabled'}}><span
+      class="glyphicon glyphicon-menu-left"></span></a>
+
+      <div class="btn-group no-float pag-numbers" role="group">
+        {{#each visiblePageNumbers as |page|}}
+          {{#if page.isLink}}
+            <button type="button" class="{{if page.isActive 'active'}} btn btn-default" {{action "gotoCustomPage" page.label}}>{{page.label}}</button>
+          {{else}}
+            <button disabled="disabled" type="button" class="btn btn-default" {{action "gotoCustomPage" page.label}}>{{page.label}}</button>
+          {{/if}}
+        {{/each}}
+      </div>
+
+      <a href="#" {{action "gotoNext"}} class={{if gotoForwardEnabled 'enabled' 'disabled'}}><span
+      class="glyphicon glyphicon-menu-right"></span></a>
+      <a href="#" {{action "gotoLast"}} class={{if gotoForwardEnabled 'enabled' 'disabled'}}><span
+      class="glyphicon glyphicon-chevron-right"></span></a>
+    </div>
+  </div>
+
+   {{! tanaño de página}}
+  <div class="col-xs-12 col-sm-2 col-sm-pull-7">
+    <div class="pull-left">
+      <select class="form-control changePageSize" {{action 'changePageSize' on='change'}}>
+        {{#each pageSizeValues key="@index" as |item|}}
+          <option value="{{item}}" selected={{is-equal item selectedValue}}>
+            {{item}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+
+  
+  {{! fin paginación }}
+</div>

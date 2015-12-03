@@ -1,0 +1,7 @@
+{{yield}}
+<td class="text-center">
+  {{#if actionUp}}
+	<button type ="button" class="btn btn-xs btn-success" {{action actionUp model}}><span class='glyphicon glyphicon-ok'></span></button>
+  {{/if}}
+  <button type="button" class="btn btn-xs btn-warning" data-dismiss="modal" {{action 'reset' model}}><span class='glyphicon glyphicon-remove'></span></button>
+</td>

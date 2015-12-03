@@ -1,0 +1,69 @@
+<div class="panel-heading {{unless showColumnsFilter "panel-heading-small"}}">
+	<div class="row">
+		<div class="col-xs-4 col-sm-6">
+			{{#if showActionNew}}
+				{{#if actionNew}}
+					{{#if createInline}}
+						<button disabled={{newElementDisabled}} type="button" class="btn btn-warning" {{action 'showCreate'}}>{{messages.new-element}}</button>
+					{{else}}
+						
+						{{#each properties as |prop|}}
+							{{#if prop.hiddeCreate}}
+								<td></td>
+							{{else}}
+								{{!-- hay que tener cuidado de no permitir la propiedad value en properties --}}
+								{{input type=prop.type placeholder=prop.title value=prop.value}} 
+							{{/if}}
+						{{/each}}
+
+						<button type="button" class="btn  btn-warning" {{action 'new'}}>New</button>
+					{{/if}}
+				{{/if}}
+			{{/if}}
+		</div>
+
+		<div class={{if showColumnsFilter "col-xs-8 col-sm-4" "col-xs-8 col-sm-6"}}>		
+			{{!-- filtro de búsqueda --}}
+			{{#if showGlobalFilter}}
+				<div class="pull-right">
+				  <form class="form-inline globalSearch width-100" action="">
+				    <div class="form-group">
+				      {{input type="text" value=filterString placeholder=messages.searchLabel class="form-control filterString"}}
+				    </div>
+				  </form>
+				</div>
+			{{/if}}
+		</div>
+		<div class="col-xs-12 col-sm-2">
+			{{#if showColumnsFilter}}
+				<div class="pull-right columns-dropdown mleft-low">
+				  <div class="btn-group">
+				    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				      {{messages.columns-title}}<span class="caret"></span>
+				    </button>
+				    <ul class="dropdown-menu pull-right">
+				      <li><a {{action "showAllColumns"}} href="#">{{messages.columns-showAll}}</a></li>
+				      <li><a {{action "hideAllColumns"}} href="#">{{messages.columns-hideAll}}</a></li>
+				      <li><a {{action "restoreDefaultVisibility"}} href="#">{{messages.columns-restoreDefaults}}</a></li>
+				      <li class="divider"></li>
+				      {{#each properties as |prop|}}
+				        {{#if prop.mayBeHidden}}
+				          <li>
+				            <a {{action "toggleHidden" prop}} href="#">
+				                {{#if prop.isVisible}}
+				                  <span class="glyphicon glyphicon-check"></span> 
+				                {{else}}
+				                  <span class="glyphicon glyphicon-unchecked"></span> 
+				                {{/if}}
+				                {{prop.title}}
+				            </a>
+				          </li>
+				        {{/if}}
+				      {{/each}}
+				    </ul>
+				  </div>
+				</div>
+			{{/if}}
+		</div>
+	</div>
+</div>

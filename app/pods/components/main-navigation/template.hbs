@@ -1,0 +1,46 @@
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      {{#link-to 'index' classNames='navbar-brand'}}
+        Home
+      {{/link-to}}
+    </div>
+    <ul class="nav navbar-nav navbar-left">
+      {{#if session.isAuthenticated}}
+        {{#link-to 'todo' tagName='li'}}<a>Todos</a>{{/link-to}}
+      {{else}}
+        {{#link-to 'login' tagName='li'}}<a>Todos</a>{{/link-to}}
+      {{/if}}
+    </ul>
+    {{! display logout button when the session is authenticated, login button otherwise }}
+    {{#if session.isAuthenticated}}
+      <div class="top-nav ">
+        <!--search & user info start-->
+        <ul class="nav pull-right top-menu">
+          <li class="dropdown">
+              <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                  <img class="img-header-profile" alt="" src={{if session.data.authenticated.picture session.data.authenticated.picture "/assets/images/avatar1_small.jpg"}}>
+                      <span class="username">
+                        {{#if session.data.authenticated.firstName }}
+                          {{session.data.authenticated.firstName}}
+                        {{else if session.data.authenticated.name }}
+                          {{session.data.authenticated.name}}
+                        {{else}}
+                          invitado
+                        {{/if}}
+                      </span>
+                  <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu extended logout">
+                  <div class="log-arrow-up"></div>
+                  <li><a href="#" {{action 'logout'}}><i class="fa fa-key"></i> Log Out</a></li>
+              </ul>
+          </li>
+        </ul>
+      </div>
+
+    {{else}}
+      <a {{action 'login'}} class="btn btn-success navbar-btn navbar-right mar-rigth-0">Login</a>
+    {{/if}}
+  </div>
+</nav>

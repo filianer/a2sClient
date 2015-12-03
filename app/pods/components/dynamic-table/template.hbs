@@ -1,0 +1,167 @@
+<div class="panel panel-default {{classResponsive}}">
+	{{#if showTableHeader}}
+		{{partial 'components/dynamic-table/table-header'}}
+	{{/if}}
+
+  	<div class="panel-body">
+
+		<table class="{{if tableStriped 'table-striped'}} {{if tableBordered 'table-bordered'}} {{if tableCondensed 'table-condensed'}} table">
+			<thead>
+				<tr class="color-th">
+					{{#if newElementDisabled}}
+						{{#each properties as |prop|}}
+							<th class="text-center v-middle {{prop.sortClass}}" {{action 'sort' prop.name}}>
+								{{prop.title}}
+							</th>
+						{{/each}}
+					{{else}}
+						{{#each properties as |prop|}}
+							{{#if prop.isVisible}}
+								<th class="text-center v-middle {{prop.sortClass}}" {{action 'sort' prop.name}}>
+									{{prop.title}}
+								</th>
+							{{/if}}
+						{{/each}}
+					{{/if}}
+					
+					{{#if actionsColumn}}
+						<th class="text-center v-middle max-width-actions">
+							<span class='glyphicon glyphicon-wrench'></span>
+						</th>
+					{{/if}}
+				</tr>
+			</thead>
+
+			<tbody>
+				{{#if allColumnsAreHidden}}
+					<tr><td colspan={{properties.length}}>{{{messages.allColumnsAreHidden}}}</td></tr>
+				{{/if}}
+				{{!-- filtrado por columnas --}}
+				{{#if useFilteringByColumns}}
+					<tr class="tr-filter">
+						{{#each properties as |prop|}}
+							{{#if prop.isVisible}}
+								{{#if prop.filterColumn}}
+									<td class="text-center v-middle">
+										{{input type="text" value=prop.filterString placeholder=messages.searchLabelColumn}}
+									</td>
+								{{else}}
+									<td></td>
+								{{/if}}
+							{{/if}}
+						{{/each}}
+						{{#if actionsColumn}}
+							<td class="max-width-actions"></td>
+						{{/if}}
+					</tr>
+				{{/if}}
+				{{!-- row para crear nuevo elemento si pasan createInline --}}
+				{{#if showActionNew}}
+					{{#if createInline}}
+						<tr class={{showCreateRow}}>
+							{{#each properties as |prop|}}
+								{{!-- {{#if prop.isVisible}} --}}
+									{{#if prop.hiddeCreate}}
+										<td></td>
+									{{else}}
+										{{#if prop.templateNew}}
+											{{!--template personalizado para cada columna --}}
+											<td>
+												{{partial prop.templateNew}}
+											</td>
+										{{else}}
+											<td class="text-center v-middle">
+												{{input class="inputNewRow" type=prop.type placeholder=prop.title value=prop.value}} 
+											</td>
+										{{/if}}
+									{{/if}}
+								{{!-- {{/if}} --}}
+							{{/each}}
+							<td class="text-center">
+								<button type ="button" class="btn btn-xs btn-success" {{action 'new'}}><span class='glyphicon glyphicon-ok'></span></button>
+								<button type ="button" class="btn btn-xs btn-warning" {{action 'cancelNew'}}><span class='glyphicon glyphicon-remove'></span></button>
+							</td>
+						</tr>
+					{{/if}}
+				{{/if}}
+				{{#if visibleContent.length}}
+					{{!-- contenido de la tabla --}}
+					{{#each visibleContent as |doc|}}
+						<tr class={{doc.visibility}}>
+							{{#each properties as |prop|}}
+								{{#if newElementDisabled}}
+									<td class="{{prop.className}}">
+										{{#if (get doc prop.name)}}
+											{{#if prop.template}}
+												{{!--template personalizado para cada columna --}}
+												{{partial prop.template}}
+											{{else}}
+												<p>{{get doc prop.name}}</p>
+											{{/if}}
+										{{/if}}
+									</td>
+
+								{{else}}
+									{{#if prop.isVisible}}
+										<td class="{{prop.className}}">
+											{{#if (get doc prop.name)}}
+												{{#if prop.template}}
+													{{!--template personalizado para cada columna --}}
+													{{partial prop.template}}
+												{{else}}
+													<p>{{get doc prop.name}}</p>
+												{{/if}}
+											{{/if}}
+										</td>
+									{{/if}}
+								{{/if}}
+								
+							{{/each}}
+
+							{{!-- columna de acciones --}}
+							{{#if actionsColumn}}
+								<td class="text-center v-middle max-width-actions">
+									{{#if route-edit}}
+										{{!-- linkeamos a la ruta del detalle para poder editar --}}
+										{{#link-to route-edit doc.id}}
+											{{#if editInline}}
+												<button class="btn btn-xs btn-success" {{action 'editInline' doc}}><span class='glyphicon glyphicon-pencil'></span></button>
+											{{else}}
+												<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#modalDetail"><span class='glyphicon glyphicon-pencil'></span></button>
+											{{/if}}
+										{{/link-to}}
+									{{/if}}
+									{{#if actionDel}}
+										<button class="btn btn-xs btn-danger" onClick={{action 'delete' doc}}><span class='glyphicon glyphicon-trash'></span></button>
+									{{/if}}
+								</td>
+							{{/if}}
+						</tr>
+						{{#if editInline}}
+							{{!-- outlet por fila para mostrar la edición en linea --}}
+							{{#if doc.visibilityEdit}}
+								<tr class="color-up-elem">
+									{{outlet}}
+								</tr>
+							{{/if}}
+						{{/if}}
+					{{/each}}
+				{{else}}
+					<tr><td colspan={{properties.length}}>{{{messages.noDataToShow}}}</td></tr>
+				{{/if}}
+			</tbody>
+		</table>
+	</div>
+
+	{{!-- paginación --}}
+	{{#if showTableFooter}}
+		{{partial 'components/dynamic-table/table-footer'}}
+	{{/if}}
+</div>
+
+{{!-- outlet para mostrar el modal de edición --}}
+{{#unless editInline}}
+	{{outlet}}
+{{/unless}}
+
+  
