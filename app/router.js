@@ -12,7 +12,7 @@ Router.map(function() {
   });
 
   this.route('container', {path: '/storage'});
-  this.route('file', {path: '/storage/file'});
+  this.route('file', {path: '/storage/:container/file'});
 });
 
 export default Router;

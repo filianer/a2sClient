@@ -1,8 +1,8 @@
 import DS from 'ember-data';
 
 export default DS.Model.extend({
-  name: DS.attr('string'),
+  _id: DS.attr('string'),
   path: DS.attr('string'),
-  size: DS.attr('number'),
-  totalFiles: DS.attr('number'),
+  totalFiles: DS.attr('string'),
+  size: DS.attr('string'),
 });
