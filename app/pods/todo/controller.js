@@ -3,16 +3,17 @@ import Ember from 'ember';
 export default Ember.Controller.extend({
 	
 	properties:[
-		{
-			name:"id",
-			title:"ID",
-			type:"text",
-			hidden:true,
-			filterColumn:true,
-			filter:false,
-			mayBeHidden:true,
-			orderColumn:true,
-		},
+		// {
+		// 	name:"id",
+		// 	title:"ID",
+		// 	type:"text",
+		// 	className:'max-width-id',
+		// 	hidden:true,
+		// 	filterColumn:true,
+		// 	filter:false,
+		// 	mayBeHidden:true,
+		// 	orderColumn:true,
+		// },
 		{
 			name:"text",
 			title:"Text",

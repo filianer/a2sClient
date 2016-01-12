@@ -55,10 +55,16 @@ function ajaxRequestA2sLoginEmail(url, login, password){
 
 /*
     Sube un archivo a una url
+    params:
+        -url: url
+        -tag: en nuestro caso el userId
+        -file: archivo que queremos subir
+        -path: ruta y nombre de archivo, tal cual como queremos que se guarde en el servidor
 */
-function ajaxRequestUploadFile(url, tag, file){
+function ajaxRequestUploadFile(url, tag, file, path){
     var formData = new FormData();
     formData.append(tag, file);
+    formData.append('path', path);
     return new Promise(function(resolve,reject){
         Ember.$.ajax({
             url: url,
@@ -74,4 +80,3 @@ function ajaxRequestUploadFile(url, tag, file){
         });
     });
 }
-

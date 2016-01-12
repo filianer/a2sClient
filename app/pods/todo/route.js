@@ -4,7 +4,10 @@ import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-rout
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
 	model() {
 		var userId = this.get('session.data.authenticated.userId');
-		return this.store.query('todo',{'userId':userId}, { reload: true });
+		// return this.store.query('todo',{'userId':userId}, { reload: true });
+		return this.store.filter('todo',{'userId':userId}, function(todo){
+			return todo;
+		});
 	},
   	actions:{
 		update:function(model){
@@ -19,15 +22,18 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 			});
 			this.transitionTo('todo');
 		},
-		new:function(newObject){
-			var that = this;
+		new:function(model){
 			var userId = this.get('session.data.authenticated.userId');
-			newObject['userId'] = userId;
-			var todo = this.store.createRecord('todo',newObject);
+			var newObject = {
+				text: model.text,
+				userId: userId
+			}
+			
+			var todo = this.store.createRecord('todo',newObject);		
 			todo.save().then(function(value) {
-	          that.refresh();
+	        	console.log("todo guardado con exito")
 	        }, function(reason) {
-	            // on rejection
+	            console.log("error al guardar: "+reason);
 	        });
 		},
 		transition:function(){

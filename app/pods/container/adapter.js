@@ -5,9 +5,4 @@ export default DS.RESTAdapter.extend({
   pathForType (modelName) {
     return null;
   },
-  urlForCreateRecord (modelName, snapshot) {
-  	this.host = Config.host + "/storage/container";
-  	modelName = "storage/container";
-  	return this._super(modelName, snapshot);
-  }
 });

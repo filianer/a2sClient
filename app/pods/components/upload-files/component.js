@@ -22,8 +22,15 @@ const keys = Object.keys;
 /*
 	Comprueba si una url es una imagen
 */
-function checkURL(url) {
+function isImage(url) {
     return(url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+}
+
+/*
+	Comprueba si una url es un video
+*/
+function isVideo(url) {
+    return(url.match(/\.(mp4|ogg|avi)$/) != null);
 }
 
 export default Ember.Component.extend({
@@ -31,21 +38,30 @@ export default Ember.Component.extend({
 	datos: A([]),
 	fileName:null,
 	newFile: null,
+	pathDownload: null,
 
 	setup: on('init', function() {
 		set(this, "datos", this.get('model'));
+		set(this, "pathDownload", this.get('pathDownload'));
 	}),
 	
 	mod: observer('datos.[]', function(){
+		var that = this;
 		var properties = this.get('properties');
 		this.datos.forEach(function(data){
 			//recorremos los datos y comprobamos si el path es una foto para mostrar la imagen
 			properties.forEach(function(prop){
-				if ( !isNone(prop.mayBeImage) && prop.mayBeImage && 
-					!isNone(get(data,prop.name)) && checkURL(get(data,prop.name))) {
-					data.set('isImage',true);
+				if ( !isNone(prop.mayBeMedia) && prop.mayBeMedia && !isNone(get(data,prop.name)) ) {
+					if ( isImage(get(data,prop.name)) ) {
+						data.set('isImage',true);
+					} else if ( isVideo(get(data,prop.name)) ) {
+						data.set('isVideo',true);
+					}
 				}
 			});
+
+			//metemos link para descargar, hacemos un encode del id (que es el nombre) por si es un path (lleva /)
+			data.set('download', that.pathDownload+encodeURIComponent(data.get('id')));
 		});	
 	}),
 
@@ -56,7 +72,7 @@ export default Ember.Component.extend({
 		    }
 		},
 		upload: function(){
-			this.sendAction('actionUpload',this.newFile);
+			this.sendAction('actionUpload',this.newFile, this.fileName);
 		},
 		changeFile: function(object){
 			set(this, 'newFile', object.files[0]);

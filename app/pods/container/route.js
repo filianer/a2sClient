@@ -20,7 +20,8 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 	afterModel: function(containers, transition){
 		//si no hay containers nos creamos uno por defecto con el id de usuario
 		if ( Ember.isNone(containers) || !containers.get('length') ) {
-			console.log("Creamos container")
+			console.log("Creamos container");
+			this.store.adapterFor('container').set('namespace',"storage/container");
 			var userId = this.get('session.data.authenticated.userId');
 			var model = this.store.createRecord('container',{
 				name:userId

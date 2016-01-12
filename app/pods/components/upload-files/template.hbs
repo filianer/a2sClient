@@ -45,9 +45,13 @@
 					<tr>
 						{{#each properties as |prop|}}
 							<td>
-								{{#if prop.mayBeImage}}
+								{{#if prop.mayBeMedia}}
 									{{#if file.isImage}}
 										<img src={{get file prop.name}} class="img-responsive">
+									{{else if file.isVideo}}
+										<video width="220" height="140" controls>
+										  <source src={{get file prop.name}}>
+										</video>
 									{{else}}
 										<p>{{get file prop.name}}</p>
 									{{/if}}
@@ -58,6 +62,9 @@
 						{{/each}}
 						
 						<td class="text-center v-middle max-width-actions">
+							{{#if pathDownload}}
+								<a href={{file.download}}><button class="btn btn-xs btn-primary"><span class='glyphicon glyphicon-download-alt'></span></button></a>
+							{{/if}}
 							<button class="btn btn-xs btn-danger" {{action 'delete' file}}><span class='glyphicon glyphicon-trash'></span></button>
 						</td>
 					</tr>
