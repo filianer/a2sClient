@@ -15,7 +15,9 @@ Llamada:
 		orderColumn: booleano para mostrar flechas de ordenación en las columnas, true para que se muestren, también habrá que 					pasar el valor useFilteringByColumns:true en el template de la tabla
 		filterColumn: booleano para que aparezca el filtro por columnas, true para que aparezca
 		template: 	url al template customizado (1),
-		hiddeCreate: booleano, true para ocultar cuando se crea un nuevo elemento
+		hiddeCreate: booleano, true para ocultar cuando se crea un nuevo elemento,
+		selectValues: array de valores si el tipo de dato es select
+		placeholder: string placeholder para el select
 	}
 ]
 
@@ -53,6 +55,7 @@ Llamada:
 	key:"firstName",
 	order:"asc" 	//asc o desc
 }
+- showConfirmation="showConfirmation" -> para mostrar diálogo de confirmación, si no se manda se muestra en un alert
 
 - tableStriped: booleano, true para mostrar la tabla con colores alternos
 

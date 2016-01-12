@@ -10,6 +10,9 @@ Router.map(function() {
   this.route('todo', function() {
     this.route('detail', {path:'/:id'});
   });
+
+  this.route('container', {path: '/storage'});
+  this.route('file', {path: '/storage/file'});
 });
 
 export default Router;

@@ -1,8 +1,8 @@
+import Ember from 'ember';
 import OAuth2PasswordGrant from 'ember-simple-auth/authenticators/oauth2-password-grant';
 import Config from 'a2s-client/config/environment';
 
 const { RSVP } = Ember;
-const { service } = Ember.inject;
 
 export default OAuth2PasswordGrant.extend({
 	authenticate(identification, password, scope = []) {
@@ -22,6 +22,13 @@ export default OAuth2PasswordGrant.extend({
 						resp['firstName'] = a2sLogin.user.firstName;
 					}
 					resolve(resp);
+					//comprobamos si tenemos un hash en la url para mandar a validar //TODO ver si este comando se manda en este lugar
+					var hash = getParameterByName('h');
+                    if ( !Ember.isNone(hash) ) {
+	                    ajaxRequestA2sValidateHash(Config.urlConfirmGuestHash, a2sLogin.user._id, hash).then(function(res){
+	                        console.log("RESPUESTA HASH: "+JSON.stringify(res));
+	                    }).catch(reject);
+	                }
 				}
 			}).catch(reject);
 		});

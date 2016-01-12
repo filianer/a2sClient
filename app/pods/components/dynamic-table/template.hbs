@@ -4,7 +4,7 @@
 	{{/if}}
 
   	<div class="panel-body">
-
+		{{#validatable-form action="new"}}
 		<table class="{{if tableStriped 'table-striped'}} {{if tableBordered 'table-bordered'}} {{if tableCondensed 'table-condensed'}} table">
 			<thead>
 				<tr class="color-th">
@@ -43,7 +43,7 @@
 							{{#if prop.isVisible}}
 								{{#if prop.filterColumn}}
 									<td class="text-center v-middle">
-										{{input type="text" value=prop.filterString placeholder=messages.searchLabelColumn}}
+										{{input type="text" value=prop.filterString placeholder=messages.searchLabelColumn autocomplete="off"}}
 									</td>
 								{{else}}
 									<td></td>
@@ -58,7 +58,18 @@
 				{{!-- row para crear nuevo elemento si pasan createInline --}}
 				{{#if showActionNew}}
 					{{#if createInline}}
-						<tr class={{showCreateRow}}>
+						{{#if newErrors}}
+							<tr class="{{showCreateRow}} createRow">
+								<td colspan={{lengthTdErrors}} class="td-error">
+									<ul class="error">
+									{{#each newErrors as |error|}}
+										<li class="text-danger">{{error.message}}</li>
+									{{/each}}
+									</ul>
+								</td>
+						    </tr>
+					    {{/if}}
+						<tr class="{{showCreateRow}} createRow">
 							{{#each properties as |prop|}}
 								{{!-- {{#if prop.isVisible}} --}}
 									{{#if prop.hiddeCreate}}
@@ -66,21 +77,31 @@
 									{{else}}
 										{{#if prop.templateNew}}
 											{{!--template personalizado para cada columna --}}
-											<td>
+											<td class="{{prop.classNew}}">
 												{{partial prop.templateNew}}
 											</td>
 										{{else}}
-											<td class="text-center v-middle">
-												{{input class="inputNewRow" type=prop.type placeholder=prop.title value=prop.value}} 
+											<td class="text-center v-middle pos-relative">
+												{{!-- {{input class="inputNewRow" type=prop.type placeholder=prop.title value=prop.value}} --}}
+												{{#if prop.selectValues}}
+													{{ember-selectize
+													  content=prop.selectValues
+													  selection=prop.value
+													  placeholder=(if prop.placeholder prop.placeholder "Select value")}}
+												{{else}}
+													{{input class="inputNewRow form-control" required=prop.required pattern=prop.pattern type=prop.type placeholder=prop.title value=prop.value title=prop.titleError autocomplete="off"}}
+												{{/if}}
 											</td>
 										{{/if}}
 									{{/if}}
 								{{!-- {{/if}} --}}
 							{{/each}}
 							<td class="text-center">
-								<button type ="button" class="btn btn-xs btn-success" {{action 'new'}}><span class='glyphicon glyphicon-ok'></span></button>
+								{{!-- <button type ="button" class="btn btn-xs btn-success" {{action 'new'}}><span class='glyphicon glyphicon-ok'></span></button> --}}
+								<button type ="submit" class="btn btn-xs btn-success"><span class='glyphicon glyphicon-ok'></span></button>
 								<button type ="button" class="btn btn-xs btn-warning" {{action 'cancelNew'}}><span class='glyphicon glyphicon-remove'></span></button>
 							</td>
+							
 						</tr>
 					{{/if}}
 				{{/if}}
@@ -132,7 +153,7 @@
 										{{/link-to}}
 									{{/if}}
 									{{#if actionDel}}
-										<button class="btn btn-xs btn-danger" onClick={{action 'delete' doc}}><span class='glyphicon glyphicon-trash'></span></button>
+										<button class="btn btn-xs btn-danger" {{action 'delete' doc}}><span class='glyphicon glyphicon-trash'></span></button>
 									{{/if}}
 								</td>
 							{{/if}}
@@ -147,10 +168,11 @@
 						{{/if}}
 					{{/each}}
 				{{else}}
-					<tr><td colspan={{properties.length}}>{{{messages.noDataToShow}}}</td></tr>
+					<tr><td class="td-no-data" colspan={{properties.length}}>{{{messages.noDataToShow}}}</td></tr>
 				{{/if}}
 			</tbody>
 		</table>
+		{{/validatable-form}}
 	</div>
 
 	{{!-- paginación --}}

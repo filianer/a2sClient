@@ -64,9 +64,9 @@ export default Ember.Component.extend({
 	// Propiedades de nuestra tabla
 	properties: [],
 	// Propiedades para la ordenación de las filas
-	sortProps: [],
+	sortProps: null,
 	//variable para almacenar la fila que se está editando
-	rowEditNow: [],
+	rowEditNow: null,
 	//clase por defecto para mostrar la fila de creación
 	showCreateRow:"hidden",
 	//flag para indicar que no hay columnas mostrandose
@@ -79,6 +79,12 @@ export default Ember.Component.extend({
 	selectedValue: 1,
 	//flag para actualizar el filtro cuando se actualizan campos
 	flagUpdateFilter:false,
+	//para controlar los errores al crear un nuevo documento
+	newErrors: null,
+	//para crear nuevo documento
+	newObject: O.create({}),
+	//tamaño de columnas que debe espandirse
+	lengthTdErrors: 0,
 
 	setup: on('init', function() {
 		this._setupConfig();
@@ -95,6 +101,9 @@ export default Ember.Component.extend({
 		var existsId = false; //para pintar ordenamiento por defecto
 		var orderKey = null; //ordenamiento por esta key, si no viene ordenaremos por el primer campo
 		var order = "desc";
+
+		this.set('rowEditNow', []);
+		this.set('sortProps', []);
 
 		//si no viene la acción de borrado ni route-edit ponemos actionsColumn a false para no pintar la columna de acciones
 		if (!this.get('actionDel') && !this.get('route-edit') && !this.get('createInline') ) {
@@ -138,6 +147,8 @@ export default Ember.Component.extend({
 			var propertyName = get(entry,'name');
 			self.addObserver(`datos.@each.${propertyName}`, self, self.updateFilter);
 		});
+
+		set(this, "lengthTdErrors", this.properties.length + 1);
 
 		//filtro para ignorar mayúsculas
 		if ( this.get('filteringIgnoreCase') ) {
@@ -225,11 +236,11 @@ export default Ember.Component.extend({
 
 	//Función de filtrado
 	filteredContent: computed('filterString', 'datos.[]', 'modelo','properties.@each.filterString', 'flagUpdateFilter', function() {
-
 		var filteringIgnoreCase = this.filteringIgnoreCase;
 		var data = this.get('modelo');
 		var properties = this.properties; //propiedades de las columnas
 		var filterString = get(this, 'filterString');
+		var that = this;
 
 		if (!data) {
 			return A([]);
@@ -237,23 +248,32 @@ export default Ember.Component.extend({
 
 		// global search, filtra por cualquier campo que tenga declarado filter=true o no tenga filter
 		var globalSearch = data.filter(function (row) {
-			return properties.any(c => {
-				//comprobamos si la propiedad es filtrable y si está visible
-				var filter = get(c, 'filter');
-				var isVisible = get(c, 'isVisible');
-				if( (isNone(filter) || filter) && (isNone(isVisible) || isVisible) ) {
-					const propertyName = get(c, 'name');
-					if (propertyName) {
-						var cellValue = '' + get(row, propertyName);
-						if (filteringIgnoreCase) {
-							cellValue = cellValue.toLowerCase();
-							filterString = filterString.toLowerCase();
+			if ( !row.get('hasDirtyAttributes') ) { //comprobamos el estado para no mostrar documentos que están mal guardados
+				return properties.any(c => {
+					//comprobamos si la propiedad es filtrable y si está visible
+					var filter = get(c, 'filter');
+					var isVisible = get(c, 'isVisible');
+					if( (isNone(filter) || filter) && (isNone(isVisible) || isVisible) ) {
+						const propertyName = get(c, 'name');
+						if (propertyName) {
+							var cellValue = '' + get(row, propertyName);
+							if (filteringIgnoreCase) {
+								cellValue = cellValue.toLowerCase();
+								filterString = filterString.toLowerCase();
+							}
+							return -1 !== cellValue.indexOf(filterString);
 						}
-						return -1 !== cellValue.indexOf(filterString);
 					}
-				}
-				return false;
-			});
+					return false;
+				});
+			} else {
+				//añadimos observadores por si cambia a estado válido
+				Ember.removeObserver(row, 'hasDirtyAttributes');
+				Ember.addObserver(row, 'hasDirtyAttributes', function(){
+					that.toggleProperty('flagUpdateFilter');
+				});
+			}
+			
 		});
 		//si no se usa filtro por columnas retornamos
 		if (!this.useFilteringByColumns) {
@@ -262,24 +282,32 @@ export default Ember.Component.extend({
 
 		//si se usa filtro por columnas filtramos el contenido para cada una de las columnas
 		return A(globalSearch.filter(row => {
-			return properties.every(c => {
-				const propertyName = get(c, 'name');
-				if (propertyName) {
-					var cellValue = '' + get(row, propertyName);
-					var filterString = get(c, 'filterString');
+			if ( !row.get('hasDirtyAttributes') ) { //comprobamos el estado para no mostrar documentos que están mal guardados
+				return properties.every(c => {
+					const propertyName = get(c, 'name');
+					if (propertyName) {
+						var cellValue = '' + get(row, propertyName);
+						var filterString = get(c, 'filterString');
 
-					if ( isEmpty(filterString) ) {
-						return true;
+						if ( isEmpty(filterString) ) {
+							return true;
+						}
+							
+						if (filteringIgnoreCase) {
+							cellValue = cellValue.toLowerCase();
+							filterString = filterString.toLowerCase();
+						}
+						return -1 !== cellValue.indexOf(filterString);
 					}
-						
-					if (filteringIgnoreCase) {
-						cellValue = cellValue.toLowerCase();
-						filterString = filterString.toLowerCase();
-					}
-					return -1 !== cellValue.indexOf(filterString);
-				}
-				return true;
-			});
+					return true;
+				});
+			} else {
+				//añadimos observadores por si cambia a estado válido
+				Ember.removeObserver(row, 'hasDirtyAttributes');
+				Ember.addObserver(row, 'hasDirtyAttributes', function(){
+					that.toggleProperty('flagUpdateFilter');
+				});
+			}
 		}));
 	}),
 
@@ -405,21 +433,24 @@ export default Ember.Component.extend({
 
 	actions: {
 		delete:function(modelo){
-			if (confirm(get(this, 'messages.confirmDelete'))) {
-		      this.sendAction('actionDel', modelo);
-		    }
+			if ( this.get('showConfirmation') ) {
+				this.sendAction('showConfirmation', null, this.get('messages.confirmDelete'), this.get("actionDel"), modelo, "danger");
+			} else {
+				if (confirm(get(this, 'messages.confirmDelete'))) {
+			      this.sendAction('actionDel', modelo);
+			    }
+			}
 		},
 		
 		new:function(){
 			//creamos nuevo objeto
-			var newObject = {};
+			var that = this;
+			this.newObject = O.create({});
 			var okValue = false;
 			this.properties.forEach(function(entry){
 				if ( isPresent(entry.value) ){
 					okValue = true;
-					newObject[entry.name] = entry.value;
-					//reseteamos propiedad
-					//Ember.set(entry,'value','');
+					that.newObject.set(entry.name, entry.value);
 				}
 			});
 
@@ -431,18 +462,25 @@ export default Ember.Component.extend({
 			//TODO: se podría mandar un validate para cada propiedad
 			if ( okValue || confirm(get(this, 'messages.confirmEmptySave')) ) {
 
-				this.sendAction('actionNew', newObject);
-
-				if ( this.get('createInline') && isNone(newObject['error_new']) ) {
-					set(this, 'showCreateRow', 'hidden');
-					set(this, 'newElementDisabled', false);
-					this.properties.forEach(function(entry){
-						if ( isPresent(entry.value) ){
-							//reseteamos propiedad
-							Ember.set(entry,'value','');
-						}
-					});
-				}
+				this.sendAction('actionNew', that.newObject);
+				
+				//añadimos observador para ocultar la fila en función de si hay o error
+				Ember.addObserver(that.newObject, 'model', function(){
+					//si no hay errores ocultamos fila
+					if ( !that.newObject.get('model.errors').get('length') ) {
+						set(that, 'showCreateRow', 'hidden');
+						set(that, 'newElementDisabled', false);
+						that.properties.forEach(function(entry){
+							if ( isPresent(entry.value) ){
+								//reseteamos propiedad
+								Ember.set(entry,'value','');
+							}
+						});
+						set(that,'newErrors', null);
+					} else {
+						set(that,'newErrors', that.newObject.get('model.errors'));
+					}
+				});
 			}
 		},
 	    
@@ -537,15 +575,29 @@ export default Ember.Component.extend({
 			//deshabilitamos botón NewElement
 			set(this, 'newElementDisabled', true);
 			//ponemos el foco en el primer input de inputNewRow
-			// this.$('.inputNewRow')[0].autofocus = true;
+			try{
+				$('.inputNewRow')[0].autofocus = true;
+			} catch(err){
+			}
 		},
 
 		//acción disparada cuando se hace click en el botón de cancelar nuevo elemento
 		cancelNew(){
+			//quitamos newObject del modelo si lo hemos llegado a crear y a fallado
+			if ( !Ember.isNone(this.newObject.get('model')) ) {
+				this.newObject.get('model').rollbackAttributes();
+			}
+			set(this,'newErrors', null);
 			//ocultamos fila de nuevo elemento
 			set(this, 'showCreateRow', 'hidden');
 			//restablecemos el botón de nuevo elemento
 			set(this, 'newElementDisabled', false);
+			this.properties.forEach(function(entry){
+				if ( isPresent(entry.value) ){
+					//reseteamos propiedad
+					Ember.set(entry,'value','');
+				}
+			});
 		},
 
 		//manejador para la edición inline
@@ -556,7 +608,6 @@ export default Ember.Component.extend({
 				set(row,'visibility', 'show_row');
 			});
 			set(this.rowEditNow,'length',0); //limpiamos array
-		
 			set(doc, 'visibilityEdit', true); //mostramos edición inline
 			set(doc, 'visibility', 'hidden'); //ocultamos row normal
 			this.rowEditNow.push(doc); //añadimos a filas en edición

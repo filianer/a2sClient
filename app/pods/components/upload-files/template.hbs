@@ -1,0 +1,71 @@
+<div class="panel panel-default {{classResponsive}}">
+	<div class="panel-heading {{unless showColumnsFilter "panel-heading-small"}}">
+		<div class="row">
+			<form enctype="multipart/form-data" id="formuploadajax" method="post">
+				<div class="col-xs-4 col-sm-3">
+					<span class="btn btn-primary btn-file">
+					    Selecciona Archivo {{!-- {{input type="file" id="fileinput" value=newFile}} --}}
+					    <input type="file" onchange={{action "changeFile" value="target"}}>
+					</span>
+				</div>
+				{{#if fileName}}
+					<div class="col-xs-4 col-sm-9">
+						<div class="input-group">
+							<span class="input-group-addon">Ruta y nombre: </span>
+					  		{{input type="text" class="form-control" value=fileName placeholder="Ruta y nombre"}}
+					      	<span class="input-group-btn">
+					      		<button type="submit" class="btn btn-warning" {{action 'upload'}}>Upload file</button>	
+					      	</span>
+					    </div>
+				    </div>	
+				{{/if}}
+			</form>
+		</div>
+	</div>
+
+  	<div class="panel-body">
+		<table class="table-striped table-bordered table-condensed table">
+			<thead>
+				<tr class="color-th">
+					{{#each properties as |prop|}}
+						<th class="text-center v-middle">
+							{{prop.title}}
+						</th>
+					{{/each}}
+					
+					<th class="text-center v-middle max-width-actions">
+						<span class='glyphicon glyphicon-wrench'></span>
+					</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				{{!-- contenido de la tabla --}}
+				{{#each datos as |file|}}
+					<tr>
+						{{#each properties as |prop|}}
+							<td>
+								{{#if prop.mayBeImage}}
+									{{#if file.isImage}}
+										<img src={{get file prop.name}} class="img-responsive">
+									{{else}}
+										<p>{{get file prop.name}}</p>
+									{{/if}}
+								{{else}}
+									<p>{{get file prop.name}}</p>
+								{{/if}}
+							</td>
+						{{/each}}
+						
+						<td class="text-center v-middle max-width-actions">
+							<button class="btn btn-xs btn-danger" {{action 'delete' file}}><span class='glyphicon glyphicon-trash'></span></button>
+						</td>
+					</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+  

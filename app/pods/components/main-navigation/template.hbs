@@ -8,8 +8,10 @@
     <ul class="nav navbar-nav navbar-left">
       {{#if session.isAuthenticated}}
         {{#link-to 'todo' tagName='li'}}<a>Todos</a>{{/link-to}}
+        {{#link-to 'container' tagName='li'}}<a>Files</a>{{/link-to}}
       {{else}}
         {{#link-to 'login' tagName='li'}}<a>Todos</a>{{/link-to}}
+        {{#link-to 'login' tagName='li'}}<a>Files</a>{{/link-to}}
       {{/if}}
     </ul>
     {{! display logout button when the session is authenticated, login button otherwise }}

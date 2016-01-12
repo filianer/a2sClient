@@ -52,3 +52,26 @@ function ajaxRequestA2sLoginEmail(url, login, password){
     });
 };
 
+
+/*
+    Sube un archivo a una url
+*/
+function ajaxRequestUploadFile(url, tag, file){
+    var formData = new FormData();
+    formData.append(tag, file);
+    return new Promise(function(resolve,reject){
+        Ember.$.ajax({
+            url: url,
+            type:'POST',
+            data: formData,
+            cache:false,
+            contentType: false,
+            processData: false
+        }).then(function(response){
+            resolve(response);
+        }, function(error){
+            reject(error);
+        });
+    });
+}
+
