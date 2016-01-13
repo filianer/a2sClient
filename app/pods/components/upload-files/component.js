@@ -27,7 +27,7 @@ function isImage(url) {
 }
 
 function testImage(url, callback, timeout) {
-    timeout = timeout || 5000;
+    timeout = timeout || 7000;
     var timedOut = false, timer;
     var img = new Image();
     img.onerror = img.onabort = function() {

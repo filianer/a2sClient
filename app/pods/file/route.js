@@ -19,12 +19,17 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 			ajaxRequestUploadFile(url, Config.uploadTag, file, path).then(function(resp){
 				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
 					result.set("resp",resp);
-					//creamos record local, en el server ya se ha guardado
-					that.store.createRecord('file',{
-						id: resp.file._id,
-						path: resp.file.path,
-						size: resp.file.size?resp.file.size:0
-					});
+					//Agregamos al store local, en el server ya se ha guardado
+					that.store.push({'data':[
+						{
+							type:'file',
+							id: resp.file._id,
+							attributes:{
+								path: resp.file.path,
+								size: resp.file.size?resp.file.size:0
+							}
+						}
+					]});
 				} else {
 					console.log("Error, respuesta incorrecta");
 				}
@@ -41,12 +46,17 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 			ajaxRequestUploadUrl(url, fileUrl, path).then(function(resp){
 				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
 					result.set("resp",resp);
-					//creamos record local, en el server ya se ha guardado
-					that.store.createRecord('file',{
-						id: resp.file._id,
-						path: resp.file.path,
-						size: resp.file.size?resp.file.size:0
-					});
+					//Agregamos al store local, en el server ya se ha guardado
+					that.store.push({'data':[
+						{
+							type:'file',
+							id: resp.file._id,
+							attributes:{
+								path: resp.file.path,
+								size: resp.file.size?resp.file.size:0
+							}
+						}
+					]});
 				} else {
 					console.log("Error, respuesta incorrecta");
 				}
