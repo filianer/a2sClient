@@ -1,21 +1,16 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
-	pathDownload: null,
-	container: null,
 	properties:[
 	{
 		name:"id",
-		title:"Name"
+		title:"Name",
+		template:'components/link-to-container'
 	},
-    {
-		name:"path",
-		title:"Preview",
-		mayBeMedia:true,
-    },
     {
 		name:"size",
 		title:"Size",
+		hiddeCreate: true,
     }
   ],
 });

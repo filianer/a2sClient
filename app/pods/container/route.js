@@ -2,38 +2,30 @@ import Ember from 'ember';
 import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
-
-
 	model: function() {
-		var userId = this.get('session.data.authenticated.userId');
-		this.store.adapterFor('container').set('namespace',"storage/container/"+userId);
-
-		var result = this.store.findAll('container').then(function(value){
-			return value;
-		}, function(error){
-			console.log("Error: "+error);
-			return null
-		});
-	
-		return result;
+		return this.store.findAll('container');
 	},
-	afterModel: function(containers, transition){
-		//si no hay containers nos creamos uno por defecto con el id de usuario
-		if ( Ember.isNone(containers) || !containers.get('length') ) {
-			console.log("Creamos container");
-			this.store.adapterFor('container').set('namespace',"storage/container");
-			var userId = this.get('session.data.authenticated.userId');
+
+	actions:{
+		new: function(container){
+			console.log("container: "+JSON.stringify(container));
 			var model = this.store.createRecord('container',{
-				name:userId
+				_id:container.id,
 			});
-			model.save().then(function(value){
-				console.log("datos guardados con éxito");
-				transition.retry();
-			}, function(reason){
-				console.log("Error creando container");
+			model.save().then(function(value) {
+	          Ember.debug("dtos guardados correctamente");
+	          container.set("model",model); //establecemos el modelo en el objeto para controlar errores en el observer del componente
+	        }, function(reason) {
+	            container.set("model",model); //establecemos el modelo en el objeto para controlar errores en el observer del componente
+	        });
+		},
+
+		delete: function(model){
+			model.deleteRecord();
+			model.save().catch(function() {
+			  console.log("error borrando datos");
+			  model.rollbackAttributes();
 			});
-		} else {
-			this.transitionTo('file');
 		}
 	}
 });

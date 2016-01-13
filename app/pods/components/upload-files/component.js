@@ -39,6 +39,9 @@ export default Ember.Component.extend({
 	fileName:null,
 	newFile: null,
 	pathDownload: null,
+	uploading:false,
+	newErrors:null,
+	result: O.create({}),
 
 	setup: on('init', function() {
 		set(this, "datos", this.get('model'));
@@ -72,7 +75,20 @@ export default Ember.Component.extend({
 		    }
 		},
 		upload: function(){
-			this.sendAction('actionUpload',this.newFile, this.fileName);
+			this.result = O.create({});
+			var that = this;
+			set(this,"uploading",true);
+			this.sendAction('actionUpload',this.newFile, this.fileName, this.result);
+			//añadimos observador para ocultar la fila en función de si hay o error
+			Ember.addObserver(that.result, 'resp', function(){
+				set(that,'uploading', false);
+				if ( Ember.isNone(that.result.resp.errors) ) {
+					set(that,'newErrors', null);
+					set(that, 'fileName', null);
+				} else {
+					set(that,'newErrors', that.result.resp.errors);
+				}
+			});
 		},
 		changeFile: function(object){
 			set(this, 'newFile', object.files[0]);
