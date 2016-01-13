@@ -86,7 +86,8 @@ export default Ember.Component.extend({
 					set(that,'newErrors', null);
 					set(that, 'fileName', null);
 				} else {
-					set(that,'newErrors', that.result.resp.errors);
+					console.log("Errors: "+JSON.stringify(that.result.resp.errors));
+					set(that,'newErrors', JSON.stringify(that.result.resp.errors));
 				}
 			});
 		},

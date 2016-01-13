@@ -30,6 +30,7 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 				}
 			}, function(err){
 				console.log("error upload file: "+err);
+				result.set("resp",{"errors":err});
 			});
 		},
 

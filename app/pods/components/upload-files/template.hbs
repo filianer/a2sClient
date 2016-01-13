@@ -27,6 +27,15 @@
 				{{/if}}
 			</form>
 		</div>
+		{{#if newErrors}}
+		<div class="panel panel-default">
+  			<div class="panel-body">
+				<ul>
+					<li class="text-danger">{{newErrors}}</li>
+				</ul>
+			</div>
+		</div>
+		{{/if}}
 	</div>
 
   	<div class="panel-body">
