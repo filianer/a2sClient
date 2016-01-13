@@ -31,9 +31,11 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 			
 			var todo = this.store.createRecord('todo',newObject);		
 			todo.save().then(function(value) {
-	        	console.log("todo guardado con exito")
+	        	console.log("todo guardado con exito");
+	        	model.set("model",todo);
 	        }, function(reason) {
 	            console.log("error al guardar: "+reason);
+	            model.set("model",todo);
 	        });
 		},
 		transition:function(){

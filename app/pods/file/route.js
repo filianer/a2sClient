@@ -16,7 +16,7 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 			var that = this;
 			var container = this.controllerFor('file').get('container');
 			var url = Config.host + "/storage/containers/"+container+"/upload";
-			ajaxRequestUploadFile(url, container, file, path).then(function(resp){
+			ajaxRequestUploadFile(url, Config.uploadTag, file, path).then(function(resp){
 				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
 					result.set("resp",resp);
 					//creamos record local, en el server ya se ha guardado
@@ -30,6 +30,28 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 				}
 			}, function(err){
 				console.log("error upload file: "+err);
+				result.set("resp",{"errors":err});
+			});
+		},
+
+		uploadUrl: function(fileUrl, path, result){
+			var that = this;
+			var container = this.controllerFor('file').get('container');
+			var url = Config.host + "/storage/containers/"+container+"/upload";
+			ajaxRequestUploadUrl(url, fileUrl, path).then(function(resp){
+				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
+					result.set("resp",resp);
+					//creamos record local, en el server ya se ha guardado
+					that.store.createRecord('file',{
+						id: resp.file._id,
+						path: resp.file.path,
+						size: resp.file.size?resp.file.size:0
+					});
+				} else {
+					console.log("Error, respuesta incorrecta");
+				}
+			}, function(err){
+				console.log("error upload url: "+err);
 				result.set("resp",{"errors":err});
 			});
 		},

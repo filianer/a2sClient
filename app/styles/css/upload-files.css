@@ -32,3 +32,26 @@
     cursor: inherit;
     display: block;
 }
+
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0px 0px 5px 5px;
+    background-color: white;
+    padding: 10px;
+    overflow: auto;
+}
+
+.nav-tabs {
+    margin-bottom: 0;
+}
+
+.max-height{
+    height: 100%;
+    padding: 0 12px;
+}
+
+.margin-image-group{
+    margin-right: 10px;
+}

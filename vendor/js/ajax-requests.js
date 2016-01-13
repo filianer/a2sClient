@@ -80,3 +80,26 @@ function ajaxRequestUploadFile(url, tag, file, path){
         });
     });
 }
+
+/*
+    Sube un archivo como url
+    params:
+        -url: url
+        -fileUrl: url del archivo
+        -path: ruta y nombre de archivo, tal cual como queremos que se guarde en el servidor
+*/
+function ajaxRequestUploadUrl(url, fileUrl, path){
+    return new Promise(function(resolve,reject){
+        Ember.$.ajax({
+            url: url,
+            type:'POST',
+            data: JSON.stringify({'path':path, 'url':fileUrl}),
+            contentType: 'application/json;charset=utf-8',
+            dataType: 'json'
+        }).then(function(response){
+            resolve(response);
+        }, function(error){
+            reject(error);
+        });
+    });
+}

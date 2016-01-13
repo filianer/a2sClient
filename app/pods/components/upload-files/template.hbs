@@ -1,32 +1,56 @@
 <div class="panel panel-default {{classResponsive}}">
-	<div class="panel-heading {{unless showColumnsFilter "panel-heading-small"}}">
-		<div class="row">
-			<form enctype="multipart/form-data" id="formuploadajax" method="post">
-				<div class="col-xs-4 col-sm-3">
-					<span class="btn btn-primary btn-file">
-					    Selecciona Archivo {{!-- {{input type="file" id="fileinput" value=newFile}} --}}
-					    <input type="file" onchange={{action "changeFile" value="target"}}>
-					</span>
-				</div>
-				{{#if fileName}}
-					<div class="col-xs-4 col-sm-9">
-						<div class="input-group">
-							<span class="input-group-addon">Ruta y nombre: </span>
-					  		{{input type="text" class="form-control" value=fileName placeholder="Ruta y nombre" disabled=(if uploading "disable")}}
-					      	<span class="input-group-btn">
-					      		<button type="submit" class="btn btn-warning" {{action 'upload'}} disabled={{if uploading "disable"}}>
-					      		{{#if uploading}}
-					      			Uploading...
-					      		{{else}}
-					      			Upload file
-					      		{{/if}}
-					      		</button>	
-					      	</span>
-					    </div>
-				    </div>	
-				{{/if}}
-			</form>
+	<div class="panel-heading">
+
+		<ul class="nav nav-tabs">
+			<li class="active"><a data-toggle="tab" href="#subirArchivo">Subir Archivo</a></li>
+			<li><a data-toggle="tab" href="#subirUrl">Subir Url</a></li>
+		</ul>
+
+		<div class="tab-content">
+			<div id="subirArchivo" class="tab-pane fade in active">
+				<form enctype="multipart/form-data" id="formuploadajax" method="post">
+					<div class="col-xs-4 col-sm-3">
+						<span class="btn btn-primary btn-file">
+						    Selecciona Archivo
+						    <input type="file" onchange={{action "changeFile" value="target"}}>
+						</span>
+					</div>
+					{{#if fileName}}
+						<div class="col-xs-4 col-sm-9">
+							<div class="input-group">
+								<span class="input-group-btn"><img src={{preview}} height="30" class="margin-image-group" /></span>
+								<span class="input-group-addon">Ruta y nombre: </span>
+						  		{{input type="text" class="form-control" value=fileName placeholder="Ruta y nombre" disabled=(if uploading "disable")}}
+						      	<span class="input-group-btn">
+						      		<button type="submit" class="btn btn-warning" {{action 'upload'}} disabled={{if uploading "disable"}}>
+						      		{{#if uploading}}
+						      			Uploading...
+						      		{{else}}
+						      			Upload file
+						      		{{/if}}
+						      		</button>	
+						      	</span>
+						    </div>
+					    </div>	
+					{{/if}}
+				</form>
+			</div>
+
+			<div id="subirUrl" class="tab-pane fade">
+				<div class="input-group">
+					{{#if fileUrlValid}}
+					<span class="input-group-btn"><img src={{fileUrlValid}} height="60" class="margin-image-group" /></span>
+			  		{{/if}}
+			  		{{input type="text" class="form-control" value=fileUrl placeholder="url" disabled=(if uploading "disable") autocomplete="on"}}
+			      	{{input type="text" class="form-control" value=fileNameUrl placeholder="Ruta y nombre" disabled=(if uploading "disable")}}
+			      	<span class="input-group-btn">
+			      		<button class="btn btn-warning max-height" {{action 'uploadUrl'}} disabled={{if uploading "disable"}}>Upload url</button>	
+			      	</span>	
+			    </div>
+			</div>
+			
 		</div>
+
 		{{#if newErrors}}
 		<div class="panel panel-default">
   			<div class="panel-body">
@@ -68,7 +92,8 @@
 										  <source src={{get file prop.name}}>
 										</video>
 									{{else}}
-										<p>{{get file prop.name}}</p>
+										{{!-- <p>{{get file prop.name}}</p> --}}
+										<img src="/assets/images/file.png" class="img-responsive">
 									{{/if}}
 								{{else}}
 									<p>{{get file prop.name}}</p>
