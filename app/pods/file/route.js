@@ -20,16 +20,7 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
 					result.set("resp",resp);
 					//Agregamos al store local, en el server ya se ha guardado
-					that.store.push({'data':[
-						{
-							type:'file',
-							id: resp.file._id,
-							attributes:{
-								path: resp.file.path,
-								size: resp.file.size?resp.file.size:0
-							}
-						}
-					]});
+					that.store.pushPayload(resp);
 				} else {
 					console.log("Error, respuesta incorrecta");
 				}
@@ -47,16 +38,7 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
 					result.set("resp",resp);
 					//Agregamos al store local, en el server ya se ha guardado
-					that.store.push({'data':[
-						{
-							type:'file',
-							id: resp.file._id,
-							attributes:{
-								path: resp.file.path,
-								size: resp.file.size?resp.file.size:0
-							}
-						}
-					]});
+					that.store.pushPayload(resp);
 				} else {
 					console.log("Error, respuesta incorrecta");
 				}
