@@ -3,6 +3,7 @@ import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-rout
 
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
 	model: function() {
+		this.store.unloadAll('container'); //vaciamos los files que había
 		return this.store.findAll('container');
 	},
 
@@ -16,6 +17,7 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 	          Ember.debug("dtos guardados correctamente");
 	          container.set("model",model); //establecemos el modelo en el objeto para controlar errores en el observer del componente
 	        }, function(reason) {
+	        	console.log("Error creando ruta: "+JSON.stringify(reason));
 	            container.set("model",model); //establecemos el modelo en el objeto para controlar errores en el observer del componente
 	        });
 		},
@@ -26,6 +28,10 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 			  console.log("error borrando datos");
 			  model.rollbackAttributes();
 			});
+		}, 
+
+		refreshRoute: function(){
+			this.refresh();
 		}
 	}
 });

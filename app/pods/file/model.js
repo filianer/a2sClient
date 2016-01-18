@@ -2,5 +2,5 @@ import DS from 'ember-data';
 
 export default DS.Model.extend({
   path: DS.attr('string'),
-  size: DS.attr('number'),
+  size: DS.attr('string'),
 });

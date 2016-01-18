@@ -4,10 +4,12 @@ import Config from 'a2s-client/config/environment';
 
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
 	model: function(params) {
+		var container = encodeURIComponent(params.container);
 		this.store.unloadAll('file'); //vaciamos los files que había
-		this.store.adapterFor('file').set('namespace',"storage/containers/"+params.container);
-		this.controllerFor('file').set('pathDownload', Config.host+"/storage/containers/"+params.container+"/download/");
-		this.controllerFor('file').set('container', params.container);
+		this.store.adapterFor('file').set('namespace',"storage/containers/"+container);
+		this.controllerFor('file').set('pathDownload', Config.host+"/storage/containers/"+container+"/download/");
+		this.controllerFor('file').set('container', container);
+		this.controllerFor('file').set('service', this.store.adapterFor('file').get('service'));
 		return this.store.findAll('file');
 	},
 
@@ -15,7 +17,8 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 		upload: function(file, path, result){
 			var that = this;
 			var container = this.controllerFor('file').get('container');
-			var url = Config.host + "/storage/containers/"+container+"/upload";
+			var service = this.store.adapterFor('file').get('service');
+			var url = Config.host + "/storage/containers/"+container+"/upload?service="+service;
 			ajaxRequestUploadFile(url, Config.uploadTag, file, path).then(function(resp){
 				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
 					result.set("resp",resp);
@@ -33,7 +36,8 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 		uploadUrl: function(fileUrl, path, result){
 			var that = this;
 			var container = this.controllerFor('file').get('container');
-			var url = Config.host + "/storage/containers/"+container+"/upload";
+			var service = this.store.adapterFor('file').get('service');
+			var url = Config.host + "/storage/containers/"+container+"/upload?service="+service;
 			ajaxRequestUploadUrl(url, fileUrl, path).then(function(resp){
 				if ( !Ember.isNone(resp.file) && !Ember.isNone(resp.file._id) && !Ember.isNone(resp.file.path) ) {
 					result.set("resp",resp);

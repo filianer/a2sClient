@@ -52,8 +52,9 @@
 
 .dynamic-table table input{
   width: 80%;
-  padding-left:0.2em;
-/*  padding:0.5em;*/
+  /*padding-left:0.2em;*/
+  display: inline-block;
+  padding:0.5em;
 }
 
 .dynamic-table .tr-filter{

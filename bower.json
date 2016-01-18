@@ -13,6 +13,7 @@
     "loader.js": "ember-cli/loader.js#3.2.1",
     "qunit": "~1.18.0",
     "bootstrap": "~3.3.6",
-    "ember-simple-auth": "0.8.0"
+    "ember-simple-auth": "0.8.0",
+    "selectize": "miguelcobain/selectize.js#master"
   }
 }

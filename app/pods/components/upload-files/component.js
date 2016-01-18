@@ -64,6 +64,7 @@ export default Ember.Component.extend({
 	fileUrl: null,
 	newFile: null,
 	pathDownload: null,
+	service: null,
 	uploading:false,
 	newErrors:null,
 	result: O.create({}),
@@ -73,6 +74,7 @@ export default Ember.Component.extend({
 	setup: on('init', function() {
 		set(this, "datos", this.get('model'));
 		set(this, "pathDownload", this.get('pathDownload'));
+		set(this, "service", this.get('service'));
 	}),
 
 	modUrl: observer('fileUrl', function(){
@@ -97,16 +99,21 @@ export default Ember.Component.extend({
 			//recorremos los datos y comprobamos si el path es una foto para mostrar la imagen
 			properties.forEach(function(prop){
 				if ( !isNone(prop.mayBeMedia) && prop.mayBeMedia && !isNone(get(data,prop.name)) ) {
-					if ( isImage(get(data,prop.name)) ) {
-						data.set('isImage',true);
-					} else if ( isVideo(get(data,prop.name)) ) {
+					if ( isVideo(get(data,prop.name)) ) {
 						data.set('isVideo',true);
+					} else {
+						testImage(get(data,prop.name), function(status){
+							if ( status ) {
+								data.set('isImage',true);
+							}
+						})	
 					}
 				}
 			});
 
+			console.log("linkDownload: "+that.pathDownload+encodeURIComponent(data.get('id'))+"?service="+that.service);
 			//metemos link para descargar, hacemos un encode del id (que es el nombre) por si es un path (lleva /)
-			data.set('download', that.pathDownload+encodeURIComponent(data.get('id')));
+			data.set('download', that.pathDownload+encodeURIComponent(data.get('id'))+"?service="+that.service);
 		});	
 	}),
 
@@ -124,7 +131,7 @@ export default Ember.Component.extend({
 			//añadimos observador para ocultar la fila en función de si hay o error
 			Ember.addObserver(that.result, 'resp', function(){
 				set(that,'uploading', false);
-				if ( Ember.isNone(that.result.resp.errors) ) {
+				if ( isNone(that.result.resp.errors) ) {
 					set(that,'newErrors', null);
 					set(that, 'fileName', null);
 				} else {
@@ -140,7 +147,7 @@ export default Ember.Component.extend({
 			//añadimos observador para ocultar la fila en función de si hay o error
 			Ember.addObserver(that.result, 'resp', function(){
 				set(that,'uploading', false);
-				if ( Ember.isNone(that.result.resp.errors) ) {
+				if ( isNone(that.result.resp.errors) ) {
 					set(that,'newErrors', null);
 					set(that, 'fileNameUrl', null);
 					set(that, 'fileUrl', null);
